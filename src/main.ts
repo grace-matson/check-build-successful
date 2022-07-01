@@ -44,6 +44,9 @@ async function run(): Promise<void> {
 
         const workflows = await octokit.actions.listRepoWorkflows({ owner, repo });
         const workflowId = workflows.data.workflows.find(w => w.name === inputs.workflow)?.id;
+        console.log("hello world");
+        core.info(workflowId);
+        console.log("closing words");
 
         if (!workflowId) {
             core.setFailed(`No workflow exists with the name "${inputs.workflow}"`);
