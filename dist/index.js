@@ -6256,7 +6256,7 @@ function run() {
                     core.debug(`Run SHA: ${run.head_sha}`);
                     core.debug(`Run Branch: ${run.head_branch}`);
                     core.debug(`Wanted branch: ${inputs.branch}`);
-                    if (triggeringSha != run.head_sha && (!inputs.branch || run.head_branch === inputs.branch)) {
+                    if ((!inputs.branch || run.head_branch === inputs.branch)) {
                         if (inputs.verify && !(yield verifyCommit(run.head_sha))) {
                             core.warning(`Failed to verify commit ${run.head_sha}. Skipping.`);
                             continue;
@@ -6267,9 +6267,6 @@ function run() {
                             : `Using ${run.head_sha} from run ${run.html_url} as last successful CI run.`);
                         sha = run.head_sha;
                         break;
-                    }
-                    else{
-                        core.info(`SHA matches`);
                     }
                 }
             }
