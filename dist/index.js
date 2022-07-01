@@ -6241,6 +6241,7 @@ function run() {
             }
             else {
                 core.info(`Discovered workflowId for search: ${workflowId}`);
+                core.info(`listing workflows : ${workflows}`);
             }
             const response = yield octokit.actions.listWorkflowRuns({ owner, repo, workflow_id: workflowId, per_page: 100 });
             const runs = response.data.workflow_runs
