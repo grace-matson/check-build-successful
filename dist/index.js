@@ -6249,6 +6249,7 @@ function run() {
                 .sort((r1, r2) => new Date(r2.created_at).getTime() - new Date(r1.created_at).getTime());
             let triggeringSha = process.env.GITHUB_SHA;
             let sha = undefined;
+            core.info(JSON.stringify(runs));
             if (runs.length > 0) {
                 for (const run of runs) {
                     core.debug(`This SHA: ${triggeringSha}`);
@@ -6260,11 +6261,15 @@ function run() {
                             core.warning(`Failed to verify commit ${run.head_sha}. Skipping.`);
                             continue;
                         }
+
                         core.info(inputs.verify
                             ? `Commit ${run.head_sha} from run ${run.html_url} verified as last successful CI run.`
                             : `Using ${run.head_sha} from run ${run.html_url} as last successful CI run.`);
                         sha = run.head_sha;
                         break;
+                    }
+                    else{
+                        core.info(`SHA matches`);
                     }
                 }
             }
