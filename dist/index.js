@@ -6274,7 +6274,7 @@ function run() {
                 core.info(`No previous runs found for branch ${inputs.branch}.`);
             }
             if (!sha) {
-                core.warning("Unable to determine SHA of last successful commit. Using SHA for current commit.");
+                core.setFailed("Unable to determine SHA of last successful commit. Using SHA for current commit.");
                 sha = triggeringSha;
             }
             core.setOutput('sha', sha);
