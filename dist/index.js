@@ -6245,20 +6245,18 @@ function run() {
             }
             const response = yield octokit.actions.listWorkflowRuns({ owner, repo, workflow_id: workflowId, per_page: 100 });
             const runs = response.data.workflow_runs
-                .filter(x => (!inputs.branch || x.head_branch === inputs.branch) && x.head_sha == inputs.commit)
+                .filter(x => (!inputs.branch || x.head_branch === inputs.branch) && x.head_sha === inputs.commit)
                 .sort((r1, r2) => new Date(r2.created_at).getTime() - new Date(r1.created_at).getTime());
             let triggeringSha = process.env.GITHUB_SHA;
             let check_sha = false;
+            core.info(`Starting check`)
             if (runs.length > 0) {
                 const x = runs[0];
                 if(x.conclusion === "success") check_sha = true;
+                core.info(`Found successful build`)
             }
             else {
                 core.info(`No previous runs found for branch ${inputs.branch} and commit ${inputs.commit}.`);
-            }
-            if (!sha) {
-                core.warning("Unable to determine SHA of last successful commit. Using SHA for current commit.");
-                check_sha = triggeringSha;
             }
             core.setOutput('check', check_sha);
         }
