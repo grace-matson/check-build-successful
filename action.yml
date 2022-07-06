@@ -18,7 +18,7 @@ inputs:
     default: 'false'
   commit:
     description: 'Commit which we want to check successful build for'
-    required: true
+    required: false
     default: ${{ github.sha }}
 runs:
   using: 'node12'
