@@ -16,6 +16,10 @@ inputs:
     description: 'Verify SHA of workflow run commit against list of commit SHAs in repository'
     required: false
     default: 'false'
+  commit:
+    description: 'Commit which we want to check successful build for'
+    required: true
+    default: ${{ github.sha }}
 runs:
   using: 'node12'
   main: 'dist/index.js'

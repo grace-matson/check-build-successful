@@ -6228,7 +6228,8 @@ function run() {
                 token: core.getInput("token"),
                 branch: core.getInput("branch"),
                 workflow: core.getInput("workflow"),
-                verify: core.getInput('verify')
+                verify: core.getInput('verify'),
+                commit: core.getInput('commit')
             };
             const octokit = github.getOctokit(inputs.token);
             const repository = process.env.GITHUB_REPOSITORY;
@@ -6241,43 +6242,25 @@ function run() {
             }
             else {
                 core.info(`Discovered workflowId for search: ${workflowId}`);
-                core.info(`listing workflows : ${JSON.stringify(workflows)}`);
             }
             const response = yield octokit.actions.listWorkflowRuns({ owner, repo, workflow_id: workflowId, per_page: 100 });
             const runs = response.data.workflow_runs
-                .filter(x => (!inputs.branch || x.head_branch === inputs.branch) && x.conclusion === "success")
+                .filter(x => (!inputs.branch || x.head_branch === inputs.branch) && x.head_sha == inputs.commit)
                 .sort((r1, r2) => new Date(r2.created_at).getTime() - new Date(r1.created_at).getTime());
             let triggeringSha = process.env.GITHUB_SHA;
-            let sha = undefined;
-            core.info(JSON.stringify(runs));
+            let check_sha = false;
             if (runs.length > 0) {
-                for (const run of runs) {
-                    core.debug(`This SHA: ${triggeringSha}`);
-                    core.debug(`Run SHA: ${run.head_sha}`);
-                    core.debug(`Run Branch: ${run.head_branch}`);
-                    core.debug(`Wanted branch: ${inputs.branch}`);
-                    if ((!inputs.branch || run.head_branch === inputs.branch)) {
-                        if (inputs.verify && !(yield verifyCommit(run.head_sha))) {
-                            core.warning(`Failed to verify commit ${run.head_sha}. Skipping.`);
-                            continue;
-                        }
-
-                        core.info(inputs.verify
-                            ? `Commit ${run.head_sha} from run ${run.html_url} verified as last successful CI run.`
-                            : `Using ${run.head_sha} from run ${run.html_url} as last successful CI run.`);
-                        sha = run.head_sha;
-                        break;
-                    }
-                }
+                const x = runs[0];
+                if(x.conclusion === "success") check_sha = true;
             }
             else {
-                core.info(`No previous runs found for branch ${inputs.branch}.`);
+                core.info(`No previous runs found for branch ${inputs.branch} and commit ${inputs.commit}.`);
             }
             if (!sha) {
-                core.setFailed("Unable to determine SHA of last successful commit. Using SHA for current commit.");
-                sha = triggeringSha;
+                core.warning("Unable to determine SHA of last successful commit. Using SHA for current commit.");
+                check_sha = triggeringSha;
             }
-            core.setOutput('sha', sha);
+            core.setOutput('check', check_sha);
         }
         catch (error) {
             core.setFailed(error.message);
