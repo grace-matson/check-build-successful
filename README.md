@@ -1,4 +1,4 @@
-# check-successful-build
+# check-build-successful
 
 This action searches whether any of the workflow-runs for the given workflow-name and branch and commit was successful.
 A cooresponding boolean string is set as output-parameter. If no matching workflow exists, the action throws an error. If the workflow has never been run for that particular commit or if all the runs were failures, the output is set to `false`.
